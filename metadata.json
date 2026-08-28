@@ -1,0 +1,6 @@
+{
+  "name": "Nimko & Kabab Co.",
+  "description": "Artisanal online store & ERP for frozen kababs and fresh nimko with category CRUD, purchase invoicing, live dispatch, and daily/weekly/monthly profit reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
