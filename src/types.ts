@@ -154,6 +154,9 @@ export interface PrimaryMaterialCategory {
   description?: string;
   defaultUnit: string; // e.g. "Kg", "Bags", "Liters", "Packs", "Cartons"
   color: string; // e.g. "red", "amber", "emerald", "blue", "purple", "orange"
+  colorBadge?: string;
+  displayOrder?: number;
+  isEnabled?: boolean;
   isCustom?: boolean;
   createdAt: string;
 }
