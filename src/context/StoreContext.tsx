@@ -111,6 +111,11 @@ interface StoreContextType {
   updateOrder: (orderId: string, updated: Partial<OrderDetails>) => void;
   updateOrderStatus: (orderId: string, status: OrderDetails['status']) => void;
   deleteOrder: (orderId: string) => void;
+  isOrderSoundEnabled: boolean;
+  toggleOrderSound: () => void;
+  lastNewOrderNotification: OrderDetails | null;
+  dismissOrderNotification: () => void;
+  simulateNewOrderAlert: () => void;
 
   // 13. Global Actions
   resetToDefaults: () => void;
@@ -134,7 +139,46 @@ const STORAGE_KEYS = {
   TOP_SELLING: 'nk_top_selling_v3',
   NIMKO_RANGE: 'nk_nimko_range_v3',
   FOOTER: 'nk_footer_config_v3',
-  ORDERS: 'nk_orders_v3'
+  ORDERS: 'nk_orders_v3',
+  SOUND_ENABLED: 'nk_order_sound_enabled_v3'
+};
+
+// Web Audio API pure synthesized chime for reliable new order alerts
+export const playNewOrderAlertSound = () => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    // Sound chime 1
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(880, ctx.currentTime); // A5
+    osc1.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.12); // E6
+    gain1.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.55);
+
+    // Sound chime 2 (harmonious bell ring)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(1046.5, ctx.currentTime + 0.1); // C6
+    osc2.frequency.exponentialRampToValueAtTime(1567.98, ctx.currentTime + 0.25); // G6
+    gain2.gain.setValueAtTime(0, ctx.currentTime);
+    gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.95);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.1);
+    osc2.stop(ctx.currentTime + 0.95);
+  } catch (err) {
+    console.warn('Audio chime notice:', err);
+  }
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -267,6 +311,34 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return DEFAULT_INITIAL_ORDERS;
     }
   });
+
+  // Sound and Live Order Notifications
+  const [isOrderSoundEnabled, setIsOrderSoundEnabled] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.SOUND_ENABLED);
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const [lastNewOrderNotification, setLastNewOrderNotification] = useState<OrderDetails | null>(null);
+
+  const toggleOrderSound = () => {
+    setIsOrderSoundEnabled(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEYS.SOUND_ENABLED, JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+  };
+
+  const dismissOrderNotification = () => {
+    setLastNewOrderNotification(null);
+  };
 
   // LocalStorage sync effects
   useEffect(() => {
@@ -553,6 +625,49 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addOrder = (order: OrderDetails) => {
     const enriched = enrichOrderWithProfit(order);
     setOrders(prev => [enriched, ...prev]);
+
+    // Trigger audible chime if sound enabled
+    if (isOrderSoundEnabled) {
+      playNewOrderAlertSound();
+    }
+
+    // Trigger instant new order notification banner
+    setLastNewOrderNotification(enriched);
+  };
+
+  const simulateNewOrderAlert = () => {
+    const mockOrder: OrderDetails = {
+      orderId: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+      customerName: 'Ayesha Tariq',
+      phone: '0300-1234567',
+      email: 'ayesha.tariq@gmail.com',
+      address: 'House #45, Block 5, Gulshan-e-Iqbal',
+      area: 'Gulshan-e-Iqbal',
+      deliveryDate: new Date().toISOString().split('T')[0],
+      timeSlot: 'Evening (5:00 PM – 8:00 PM)',
+      paymentMethod: 'cod',
+      paymentStatus: 'Pending',
+      notes: 'Please pack extra mint chutney & handle with care',
+      items: [
+        {
+          cartItemId: `item-${Date.now()}-1`,
+          productId: products[0]?.id || 'p1',
+          product: products[0] || ({} as any),
+          selectedPack: products[0]?.packOptions?.[1] || { size: '1 Dozen (12 Pcs)', weightGrams: 500, price: 980, costPrice: 540 },
+          quantity: 2
+        }
+      ],
+      subtotal: 1960,
+      discountAmount: 0,
+      deliveryFee: 150,
+      total: 2110,
+      costTotal: 1080,
+      profit: 1030,
+      createdAt: new Date().toISOString(),
+      status: 'Received'
+    };
+
+    addOrder(mockOrder);
   };
 
   const updateOrder = (orderId: string, updated: Partial<OrderDetails>) => {
@@ -704,6 +819,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateOrder,
         updateOrderStatus,
         deleteOrder,
+        isOrderSoundEnabled,
+        toggleOrderSound,
+        lastNewOrderNotification,
+        dismissOrderNotification,
+        simulateNewOrderAlert,
         resetToDefaults,
         resetToFactoryDefaults: resetToDefaults,
         exportConfigJson,

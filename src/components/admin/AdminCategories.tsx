@@ -59,7 +59,8 @@ export const AdminCategories: React.FC = () => {
     iconName: 'drumstick',
     colorBadge: 'red',
     displayOrder: categories.length + 1,
-    isEnabled: true
+    isEnabled: true,
+    status: 'published'
   });
 
   // Primary Material Category CRUD state

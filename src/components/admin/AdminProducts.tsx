@@ -37,6 +37,7 @@ export const AdminProducts: React.FC = () => {
     category: 'chicken',
     tagline: '',
     description: '',
+    status: 'published',
     image: SAMPLE_IMAGE_PRESETS[1].url,
     galleryImages: [SAMPLE_IMAGE_PRESETS[1].url],
     packOptions: [
@@ -282,7 +283,7 @@ export const AdminProducts: React.FC = () => {
                 <th className="py-3.5 px-4">Product Info & Image</th>
                 <th className="py-3.5 px-4">Category & Unit</th>
                 <th className="py-3.5 px-4">Pack Options & Prices</th>
-                <th className="py-3.5 px-4">Spice Level</th>
+                <th className="py-3.5 px-4">Status</th>
                 <th className="py-3.5 px-4 text-center">Bestseller</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
@@ -291,6 +292,7 @@ export const AdminProducts: React.FC = () => {
               {filteredProducts.map((prod) => {
                 const isKabab = prod.category === 'chicken' || prod.category === 'beef';
                 const isNimko = prod.category === 'nimko';
+                const isPublished = prod.status !== 'draft';
                 return (
                   <tr key={prod.id} className="hover:bg-[#FAF7F0]/60 transition-colors">
                     {/* Info */}
@@ -358,11 +360,15 @@ export const AdminProducts: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* Spice Level */}
+                    {/* Status (Publish vs Revision) */}
                     <td className="py-3 px-4">
-                      <span className="font-medium text-xs flex items-center gap-1">
-                        <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                        {prod.spiceLevel}
+                      <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full ${
+                        isPublished
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : 'bg-amber-100 text-amber-800 border border-amber-300'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isPublished ? 'bg-emerald-600' : 'bg-amber-600'}`}></span>
+                        {isPublished ? 'Published' : 'In Revision'}
                       </span>
                     </td>
 
@@ -508,6 +514,18 @@ export const AdminProducts: React.FC = () => {
                     placeholder="e.g. Rs. 980 / Dozen, Rs. 540 / 500g"
                     className="w-full bg-[#FAF7F0] border border-[#DDD4CA] text-xs font-semibold px-3 py-2 rounded-xl outline-none"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#3D2821] mb-1">Storefront Status *</label>
+                  <select
+                    value={formData.status || 'published'}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'published' | 'draft' })}
+                    className="w-full bg-[#FAF7F0] border border-[#DDD4CA] text-xs font-bold px-3 py-2 rounded-xl outline-none text-[#2D1A16]"
+                  >
+                    <option value="published">✅ Published (Live on Storefront)</option>
+                    <option value="draft">⏳ Draft / In Revision (Hidden)</option>
+                  </select>
                 </div>
               </div>
 

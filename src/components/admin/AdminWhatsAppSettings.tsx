@@ -197,6 +197,76 @@ export const AdminWhatsAppSettings: React.FC = () => {
           </div>
         </div>
 
+        {/* WhatsApp Scannable QR Code & Packaging Sticker Card */}
+        <div className="bg-white p-6 rounded-2xl border border-[#E8DFC8] shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold text-[#2D1A16] font-display uppercase tracking-wider flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                Storefront WhatsApp QR Code & Instant Scan
+              </h3>
+              <p className="text-xs text-stone-500">
+                Customers can scan this QR code directly from their phone camera or WhatsApp to start ordering.
+              </p>
+            </div>
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-200">
+              Live Scannable QR
+            </span>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-6 pt-2">
+            <div className="bg-[#FAF7F0] p-4 rounded-2xl border-2 border-[#E2D8C9] shadow-inner text-center shrink-0">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&color=075E54&bgcolor=FAF7F0&data=${encodeURIComponent(`https://wa.me/${formData.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Salam! I'm ordering from ${formData.brandName}.`)}`)}`}
+                alt="Store WhatsApp QR Code"
+                referrerPolicy="no-referrer"
+                className="w-44 h-44 mx-auto rounded-xl object-contain bg-white p-1 border border-stone-200 shadow-xs"
+              />
+              <div className="mt-2 text-xs font-mono font-bold text-[#2D1A16]">
+                {formData.whatsappDisplay || formData.whatsappNumber}
+              </div>
+            </div>
+
+            <div className="space-y-3 flex-1 text-xs text-stone-600">
+              <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200 space-y-1.5">
+                <div className="font-bold text-stone-900 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  How WhatsApp Direct QR Works:
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-[11px] text-stone-600">
+                  <li>Customers on desktop can scan with their phone camera to instantly transfer their cart to mobile WhatsApp.</li>
+                  <li>Print this QR code on takeaway boxes, bag stickers, and flyer menus for frictionless repeat orders.</li>
+                  <li>Automatically links to your verified hotline number: <strong className="text-emerald-700">+{formData.whatsappNumber.replace(/[^0-9]/g, '')}</strong></li>
+                </ul>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = `https://wa.me/${formData.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Salam! I'm ordering from ${formData.brandName}.`)}`;
+                    navigator.clipboard.writeText(url);
+                    alert('WhatsApp direct order link copied to clipboard!');
+                  }}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold px-3.5 py-2 rounded-xl transition-colors cursor-pointer text-xs"
+                >
+                  Copy WhatsApp Direct Link
+                </button>
+
+                <a
+                  href={`https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=12&color=075E54&bgcolor=FAF7F0&data=${encodeURIComponent(`https://wa.me/${formData.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Salam! I'm ordering from ${formData.brandName}.`)}`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl transition-colors cursor-pointer text-xs inline-flex items-center gap-1.5"
+                >
+                  <span>Download High-Res QR for Printing</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing & Delivery Thresholds Group */}
         <div className="bg-white p-6 rounded-2xl border border-[#E8DFC8] shadow-xs space-y-4">
           <h3 className="text-sm font-bold text-[#2D1A16] font-display uppercase tracking-wider flex items-center gap-2">

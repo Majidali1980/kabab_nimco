@@ -15,6 +15,7 @@ import { ProductDetailModal } from './components/ProductDetailModal';
 import { CookingGuideModal } from './components/CookingGuideModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { QuickToast } from './components/QuickToast';
+import { NewOrderToast } from './components/NewOrderToast';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 
@@ -472,6 +473,17 @@ export default function App() {
       <CookingGuideModal
         isOpen={isCookingGuideOpen}
         onClose={() => setIsCookingGuideOpen(false)}
+      />
+
+      {/* Live New Order Notification Toast Alert */}
+      <NewOrderToast
+        onOpenAdminOrders={() => {
+          if (isAdminAuthenticated) {
+            setCurrentPage('admin');
+          } else {
+            setIsAdminLoginOpen(true);
+          }
+        }}
       />
 
       {/* Admin Authentication Login Modal (Hidden Access via Ctrl+Shift+A, #admin or Discreet Lock) */}

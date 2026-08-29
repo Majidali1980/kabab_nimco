@@ -40,6 +40,7 @@ export const AdminDeals: React.FC = () => {
     ],
     servings: '6–8 Persons',
     expiryHoursLeft: 8,
+    status: 'published',
     description: 'Our most sought-after deal for families. Get restaurant-quality charcoal smoked chicken and beef kababs with crunchy Karachi nimko snacks at an unbeatable price.'
   };
 

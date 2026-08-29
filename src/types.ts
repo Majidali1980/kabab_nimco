@@ -14,6 +14,7 @@ export interface CategoryItem {
   colorBadge?: string; // e.g. "red", "amber", "emerald", "purple", "blue"
   displayOrder: number;
   isEnabled: boolean;
+  status?: 'published' | 'draft';
 }
 
 export interface PackOption {
@@ -65,6 +66,7 @@ export interface Product {
     fat: string;
   };
   altText: string;
+  status?: 'published' | 'draft';
 }
 
 export interface Deal {
@@ -83,6 +85,7 @@ export interface Deal {
   servings: string;
   expiryHoursLeft?: number;
   description: string;
+  status?: 'published' | 'draft';
 }
 
 export interface CartItem {
